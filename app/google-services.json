@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "496250327638",
+    "project_id": "trailquestapp-67b8d",
+    "storage_bucket": "trailquestapp-67b8d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496250327638:android:c5366973f344a9bf4461f7",
+        "android_client_info": {
+          "package_name": "com.example.trailquest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCABZns4JAaO0ItJf-JZVf0oy7xBpfaPzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496250327638:android:b86a2e344a687bbc4461f7",
+        "android_client_info": {
+          "package_name": "com.example.trailquestapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCABZns4JAaO0ItJf-JZVf0oy7xBpfaPzc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
