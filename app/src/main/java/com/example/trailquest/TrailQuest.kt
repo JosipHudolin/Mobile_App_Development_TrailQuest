@@ -36,6 +36,15 @@ fun TrailQuest(navController: NavHostController) {
             MyLocationScreen(onBackClick = { navController.navigate("main_menu_screen") }) {
             }
         }
+        composable("all_locations_screen") {
+            AllLocationsScreen(onBackClick = { navController.navigate("main_menu_screen") })
+        }
+        composable("compass_screen") {
+            CompassScreen(onBackClick = { navController.navigate("main_menu_screen") })
+        }
+        composable("userdata_change_screen") {
+            UserdataChangeScreen(onBackClick = { navController.navigate("main_menu_screen") })
+        }
         // Additional composable functions...
     }
 }
