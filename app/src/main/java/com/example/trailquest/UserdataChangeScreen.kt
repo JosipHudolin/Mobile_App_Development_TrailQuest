@@ -1,5 +1,7 @@
 package com.example.trailquest
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -20,19 +22,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import androidx.lifecycle.lifecycleScope
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.auth
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserdataChangeScreen(onBackClick: () -> Unit) {
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
-
-    var newEmail by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var isChangingEmail by remember { mutableStateOf(false) }
     var isChangingPassword by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val user = auth.currentUser
 
     Column(
         modifier = Modifier
@@ -77,55 +84,6 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Change Email Section
-        Text("Change Email", style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace, color = Color(0xFF034620)))
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = newEmail,
-            onValueChange = { newEmail = it },
-            label = { Text("New Email") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                cursorColor = Color(0xFF034620),
-                focusedIndicatorColor = Color(0xFF034620)
-            )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(
-            onClick = {
-                if (newEmail.isNotEmpty()) {
-                    isChangingEmail = true
-                    auth.currentUser?.updateEmail(newEmail)
-                        ?.addOnCompleteListener { task ->
-                            isChangingEmail = false
-                            if (task.isSuccessful) {
-                                Toast.makeText(context, "Email updated successfully", Toast.LENGTH_SHORT).show()
-                            } else {
-                                errorMessage = task.exception?.message ?: "Failed to update email"
-                            }
-                        }
-                } else {
-                    errorMessage = "Please enter a new email"
-                }
-            },
-            modifier = Modifier
-                .width(200.dp)
-                .height(50.dp)
-                .background(color = Color(0xFF034620), shape = RoundedCornerShape(15.dp)), // Background color, radius 15
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF034620)) // Override button colors
-        ) {
-            if (isChangingEmail) {
-                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-            } else {
-                Text("Update Email", color = Color.White)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
-
         // Change Password Section
         Text("Change Password", style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace, color = Color(0xFF034620)))
         Spacer(modifier = Modifier.height(8.dp))
@@ -136,7 +94,7 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
+                containerColor = Color(0xFFF9EDDB),
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black,
                 cursorColor = Color(0xFF034620),
@@ -151,7 +109,7 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = TextFieldDefaults.textFieldColors(
-                containerColor = Color.White,
+                containerColor = Color(0xFFF9EDDB),
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black,
                 cursorColor = Color(0xFF034620),
@@ -161,19 +119,20 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                if (newPassword == confirmPassword && newPassword.isNotEmpty()) {
-                    isChangingPassword = true
-                    auth.currentUser?.updatePassword(newPassword)
-                        ?.addOnCompleteListener { task ->
-                            isChangingPassword = false
-                            if (task.isSuccessful) {
-                                Toast.makeText(context, "Password updated successfully", Toast.LENGTH_SHORT).show()
-                            } else {
-                                errorMessage = task.exception?.message ?: "Failed to update password"
-                            }
+                if (user != null) {
+                    user.updatePassword(newPassword)
+                        .addOnSuccessListener {
+                            // Password updated successfully
+                            Toast.makeText(context, "Password updated successfully", Toast.LENGTH_SHORT).show()
+                        }
+                        .addOnFailureListener { exception->
+                            // Handle the error
+                            val errorMessage = exception.message ?: "Failed to update password"
+                            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
+                            // Log the exception for debugging purposes
                         }
                 } else {
-                    errorMessage = "Passwords do not match or are empty"
+                    // User is not logged in, handle accordingly (e.g., redirect to login)
                 }
             },
             modifier = Modifier

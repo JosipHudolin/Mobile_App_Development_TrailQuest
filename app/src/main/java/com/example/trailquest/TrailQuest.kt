@@ -14,7 +14,7 @@ fun TrailQuest(navController: NavHostController) {
                 onCurrentLocationClick = { navController.navigate("my_location_screen") },
                 onAllLocationsClick = { navController.navigate("all_locations_screen") },
                 onCompassClick = { navController.navigate("compass_screen") },
-                onUserDataChangeClick = { navController.navigate("user_data_change_screen") },
+                onUserDataChangeClick = { navController.navigate("userdata_change_screen") },
                 navController = navController
             )
         }

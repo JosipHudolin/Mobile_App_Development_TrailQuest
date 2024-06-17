@@ -61,7 +61,9 @@ fun MainMenuScreen(
             Text("Current Location")
         }
         Spacer(modifier = Modifier.height(15.dp))
-        Button(onClick = onAllLocationsClick,
+        Button(onClick = {
+                onAllLocationsClick()
+        },
             modifier = Modifier
                 .width(200.dp)
                 .height(50.dp)
