@@ -5,10 +5,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun TrailQuest(navController: NavHostController) {
-    NavHost(navController = navController, startDestination = "login_screen") {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    NavHost(navController = navController, startDestination = if (currentUser !=null) "main_menu_screen" else "login_screen") {
         composable("main_menu_screen") {
             MainMenuScreen(
                 onCurrentLocationClick = { navController.navigate("my_location_screen") },

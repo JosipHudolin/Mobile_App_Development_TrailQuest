@@ -25,6 +25,8 @@ import com.google.firebase.firestore.GeoPoint
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllLocationsScreen(onBackClick: () -> Unit) {
+
+
     val firestore = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
     val userId = auth.currentUser?.uid
@@ -33,7 +35,7 @@ fun AllLocationsScreen(onBackClick: () -> Unit) {
     var errorMessage by remember { mutableStateOf("") }
 
     // Fetch the locations for the logged-in user
-    LaunchedEffect(userId) {
+    LaunchedEffect(Unit) {
         if (userId != null) {
             firestore.collection("locations")
                 .whereEqualTo("userId", userId)
@@ -122,7 +124,7 @@ fun AllLocationsScreen(onBackClick: () -> Unit) {
             }
         }
     }
-}
+ }
 
 // Data class for Location
 data class Location(

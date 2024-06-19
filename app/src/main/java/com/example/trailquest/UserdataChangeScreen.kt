@@ -82,7 +82,7 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
             )
         )
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(70.dp))
 
         // Change Password Section
         Text("Change Password", style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace, color = Color(0xFF034620)))
@@ -98,7 +98,9 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black,
                 cursorColor = Color(0xFF034620),
-                focusedIndicatorColor = Color(0xFF034620)
+                focusedIndicatorColor = Color(0xFF034620),
+                focusedLabelColor = Color(0xFF034620),
+                unfocusedLabelColor = Color(0xFF034620)
             )
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -113,7 +115,9 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
                 focusedTextColor = Color.Black,
                 unfocusedTextColor = Color.Black,
                 cursorColor = Color(0xFF034620),
-                focusedIndicatorColor = Color(0xFF034620)
+                focusedIndicatorColor = Color(0xFF034620),
+                focusedLabelColor = Color(0xFF034620),
+                unfocusedLabelColor = Color(0xFF034620)
             )
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -134,6 +138,9 @@ fun UserdataChangeScreen(onBackClick: () -> Unit) {
                 } else {
                     // User is not logged in, handle accordingly (e.g., redirect to login)
                 }
+                newPassword = ""
+                confirmPassword = ""
+                isChangingPassword = false
             },
             modifier = Modifier
                 .width(200.dp)

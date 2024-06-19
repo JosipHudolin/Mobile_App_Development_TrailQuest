@@ -39,6 +39,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("MissingPermission")
@@ -132,12 +137,21 @@ fun MyLocationScreen(
             )
         )
 
+        val properties by remember {
+            mutableStateOf(
+                MapProperties(
+                    mapType = MapType.HYBRID
+                )
+            )
+        }
+
         currentLocation?.let { location ->
             GoogleMap(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                cameraPositionState = cameraPositionState
+                cameraPositionState = cameraPositionState,
+                properties = properties
             ) {
                 Marker(
                     state = MarkerState(position = location),
