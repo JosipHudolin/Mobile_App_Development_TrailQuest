@@ -2,10 +2,12 @@ package com.example.trailquest
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.GeoPoint
 
 @Composable
 fun TrailQuest(navController: NavHostController) {
@@ -39,13 +41,33 @@ fun TrailQuest(navController: NavHostController) {
             }
         }
         composable("all_locations_screen") {
-            AllLocationsScreen(onBackClick = { navController.navigate("main_menu_screen") })
+            AllLocationsScreen(onBackClick = { navController.navigate("main_menu_screen") }, navController = navController)
         }
         composable("compass_screen") {
             CompassScreen(onBackClick = { navController.navigate("main_menu_screen") })
         }
         composable("userdata_change_screen") {
             UserdataChangeScreen(onBackClick = { navController.navigate("main_menu_screen") })
+        }
+        composable(
+            "locationDetail/{documentId}/{latitude}/{longitude}",
+            arguments = listOf(
+                navArgument("documentId") { type = NavType.StringType },
+                navArgument("latitude") { type = NavType.FloatType },
+                navArgument("longitude") { type = NavType.FloatType }
+            )
+        ) { backStackEntry ->
+            val documentId = backStackEntry.arguments?.getString("documentId")!!
+            val latitude = backStackEntry.arguments?.getFloat("latitude")!!
+            val longitude = backStackEntry.arguments?.getFloat("longitude")!!
+            LocationDetailScreen(
+                location = GeoPoint(latitude.toDouble(), longitude.toDouble()),
+                documentId = documentId,
+                onBackClick = { navController.navigateUp() },
+                onDeleteSuccess = {
+                    navController.popBackStack()
+                }
+            )
         }
         // Additional composable functions...
     }

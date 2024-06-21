@@ -1,11 +1,12 @@
 package com.example.trailquest
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -13,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -24,9 +24,7 @@ import com.google.firebase.firestore.GeoPoint
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AllLocationsScreen(onBackClick: () -> Unit) {
-
-
+fun AllLocationsScreen(navController: NavController, onBackClick: () -> Unit) {
     val firestore = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
     val userId = auth.currentUser?.uid
@@ -66,65 +64,72 @@ fun AllLocationsScreen(onBackClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(color = Color(0xFFF9EDDB)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TopAppBar(
             title = {
                 Text(
-                    "My Location",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = MaterialTheme.typography.bodyMedium.fontWeight),
+                    "My Locations",
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+                    ),
                     color = Color(0xFF034620)
                 )
             },
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
-                    // Wrapping the icon in a circular Box
                     Box(
                         modifier = Modifier
-                            .size(40.dp) // Adjust size as needed
+                            .size(40.dp)
                             .background(
-                                color = Color(0xFF034620), // Circle background color
+                                color = Color(0xFF034620),
                                 shape = CircleShape
                             ),
-                        contentAlignment = Alignment.Center // Center the icon within the circle
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White // Arrow icon color
+                            tint = Color.White
                         )
                     }
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFFF9EDDB) // TopAppBar background color
+                containerColor = Color(0xFFF9EDDB)
             )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (isLoading) {
-            CircularProgressIndicator(color = Color(0xFF034620))
-        } else if (errorMessage.isNotEmpty()) {
-            Text(
-                text = errorMessage,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace)
-            )
-        } else {
-            // Display location cards
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                locations.forEach { location ->
-                    LocationCard(location)
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            locations.forEach { location ->
+                LocationCard(
+                    location = location,
+                    onOpenClick = {
+                        openLocation(navController, location.geoPoint, location.documentId)
+                    },
+                    onDelete = {
+                        deleteLocation(navController, location.documentId) {
+                            // Update the list after deletion
+                            locations = locations.filter { it.documentId != location.documentId }
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }
- }
+}
+
+
+
 
 // Data class for Location
 data class Location(
@@ -134,18 +139,19 @@ data class Location(
 )
 
 // Function to open location on map
-fun openLocation(geoPoint: GeoPoint) {
-    // Implement opening location on map or perform any other action based on geoPoint
+fun openLocation(navController: NavController, geoPoint: GeoPoint, documentId: String) {
+    navController.navigate("locationDetail/$documentId/${geoPoint.latitude}/${geoPoint.longitude}")
 }
 
 // Function to delete location
-fun deleteLocation(documentId: String) {
+fun deleteLocation(navController: NavController, documentId: String, onSuccess: () -> Unit) {
     val db = FirebaseFirestore.getInstance()
     db.collection("locations")
         .document(documentId)
         .delete()
         .addOnSuccessListener {
             Log.d("AllLocationsScreen", "Location deleted successfully")
+            onSuccess()
         }
         .addOnFailureListener { e ->
             Log.e("AllLocationsScreen", "Error deleting location", e)
@@ -153,50 +159,67 @@ fun deleteLocation(documentId: String) {
 }
 
 
+
 @Composable
-fun LocationCard(location: Location) {
+fun LocationCard(location: Location, onOpenClick: () -> Unit, onDelete: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(10.dp),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .background(color = Color(0xFFe9ffdb)),
         ) {
             Text(
                 text = "Location", // Default identifier since there's no name field
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .padding(top = 16.dp),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontFamily = FontFamily.Monospace,
-                    color = Color.Black
+                    color = Color(0xFF034620)
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .padding(bottom = 7.dp)
+                    .padding(top = 16.dp),
                 text = "Saved at: ${location.timestamp.toDate()}",
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontFamily = FontFamily.Monospace,
-                    color = Color.Gray
+                    color = Color(0xFF034620)
                 )
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row {
                 Button(
-                    onClick = { openLocation(location.geoPoint) },
+                    onClick = onOpenClick,
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 4.dp)
+                        .width(155.dp)
+                        .height(50.dp)
+                        .padding(end = 8.dp)
+                        .padding(start = 16.dp)
+                        .padding(bottom = 16.dp)
+                        .background(color = Color(0xFF034620), shape = RoundedCornerShape(15.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF034620))
                 ) {
                     Text("Open")
                 }
                 Button(
-                    onClick = { deleteLocation(location.documentId) },
+                    onClick = onDelete,
                     modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 4.dp)
+                        .width(140.dp)
+                        .height(50.dp)
+                        .padding(bottom = 16.dp)
+                        .padding(start = 8.dp)
+                        .background(color = Color(0xFF034620), shape = RoundedCornerShape(15.dp)),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF034620))
                 ) {
                     Text("Delete")
                 }
@@ -204,3 +227,8 @@ fun LocationCard(location: Location) {
         }
     }
 }
+
+
+
+
+

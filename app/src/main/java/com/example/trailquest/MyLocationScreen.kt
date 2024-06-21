@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -99,16 +98,21 @@ fun MyLocationScreen(
         }
     }
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(color = Color(0xFFF9EDDB)),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color(0xFFF9EDDB)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TopAppBar(
             title = {
                 Text(
                     "My Location",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontFamily = FontFamily.Monospace, fontSize = MaterialTheme.typography.bodyMedium.fontSize, fontWeight = MaterialTheme.typography.bodyMedium.fontWeight),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
+                    ),
                     color = Color(0xFF034620)
                 )
             },
@@ -169,6 +173,7 @@ fun MyLocationScreen(
                 currentLocation?.let {
                     val geoPoint = GeoPoint(it.latitude, it.longitude)
                     saveLocationToFirestore(userId, geoPoint, {
+                        Toast.makeText(context, "Location saved successfully!", Toast.LENGTH_SHORT).show()
                         onSaveLocation(geoPoint)
                     }, { errorMessage ->
                         // Handle error
@@ -187,7 +192,6 @@ fun MyLocationScreen(
         Spacer(modifier = Modifier.height(20.dp))
     }
 }
-
 
 // Function to save location to Firestore
 fun saveLocationToFirestore(
@@ -212,6 +216,7 @@ fun saveLocationToFirestore(
             onError(exception.message ?: "Unknown error occurred")
         }
 }
+
 
 
 

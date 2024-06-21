@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.auth.FirebaseAuthUserCollisionException
 
 class AuthViewModel : ViewModel() {
 
