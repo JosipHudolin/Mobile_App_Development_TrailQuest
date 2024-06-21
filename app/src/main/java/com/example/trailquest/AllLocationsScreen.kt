@@ -166,13 +166,13 @@ fun LocationCard(location: Location, onOpenClick: () -> Unit, onDelete: () -> Un
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = Color(0xFFe9ffdb)),
+                .background(color = Color(0xFFBACD92)),
         ) {
             Text(
                 text = "Location", // Default identifier since there's no name field
